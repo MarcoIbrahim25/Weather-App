@@ -1,4 +1,4 @@
-🌤️ Weather App
+**🌤️ Weather App**
 
 This is a simple Weather Dashboard built with React and Tailwind CSS.
 It lets you search for a city and see the current weather using data from OpenWeatherMap API.
