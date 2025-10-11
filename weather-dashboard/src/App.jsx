@@ -4,6 +4,7 @@ import WeatherCard from "./components/WeatherCard";
 import ErrorMessage from "./components/ErrorMessage";
 import UnitToggle from "./components/UnitToggle";
 import CityHistory from "./components/CityHistory";
+import Loader from "./components/Loader";
 import { fetchCurrent } from "./logic/api";
 
 const STORAGE_KEY = "recentCities";
@@ -15,6 +16,7 @@ export default function App() {
   const [err, setErr] = useState("");
   const [lastCity, setLastCity] = useState("");
   const [recent, setRecent] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
@@ -34,18 +36,22 @@ export default function App() {
     setErr("");
     setData(null);
     setLastCity(city);
+    setLoading(true);
     try {
       const res = await fetchCurrent(city, units);
       setData(res);
       saveRecent(city);
     } catch {
       setErr("City not found or API error. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!lastCity) return;
     (async () => {
+      setLoading(true);
       try {
         const res = await fetchCurrent(lastCity, units);
         setData(res);
@@ -53,6 +59,8 @@ export default function App() {
       } catch {
         setErr("City not found or API error. Try again.");
         setData(null);
+      } finally {
+        setLoading(false);
       }
     })();
   }, [units, lastCity]);
@@ -76,7 +84,8 @@ export default function App() {
         onClear={clearRecent}
       />
       <ErrorMessage msg={err} />
-      <WeatherCard data={data} units={units} />
+
+      {loading ? <Loader /> : <WeatherCard data={data} units={units} />}
     </div>
   );
 }
