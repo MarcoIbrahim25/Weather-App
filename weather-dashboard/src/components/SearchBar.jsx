@@ -1,18 +1,21 @@
 export default function SearchBar({ onSearch }) {
-  const submit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const city = new FormData(e.currentTarget).get("city")?.trim();
     if (city) onSearch(city);
   };
 
   return (
-    <form onSubmit={submit} className="flex gap-2">
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
       <input
         name="city"
-        placeholder="Enter city..."
-        className="border px-3 py-2 rounded w-full"
+        aria-label="Search city"
+        placeholder="Enter city name..."
+        className="border border-gray-300 focus:border-sky-400 focus:ring-2 focus:ring-sky-100 px-3 py-2 rounded-lg w-full outline-none"
       />
-      <button className="px-4 py-2 rounded bg-black text-white">Search</button>
+      <button className="px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 active:opacity-80 transition">
+        Search
+      </button>
     </form>
   );
 }
