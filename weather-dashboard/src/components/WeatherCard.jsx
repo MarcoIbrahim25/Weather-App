@@ -1,10 +1,16 @@
 export default function WeatherCard({ data, units }) {
   if (!data) return null;
+
   const tempUnit = units === "metric" ? "°C" : "°F";
+  const windUnit = units === "metric" ? "km/h" : "mph";
   const icon = data.weather?.[0]?.icon
     ? `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
     : null;
   const condition = data.weather?.[0]?.main ?? "";
+  const windSpeed =
+    units === "metric"
+      ? Math.round(data.wind.speed * 3.6)
+      : Math.round(data.wind.speed);
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white/70 backdrop-blur p-5 shadow-sm">
@@ -33,7 +39,7 @@ export default function WeatherCard({ data, units }) {
           Humidity <strong>{data.main.humidity}%</strong>
         </span>
         <span>
-          Wind <strong>{Math.round(data.wind.speed)}</strong>
+          Wind <strong>{windSpeed}</strong> {windUnit}
         </span>
       </div>
     </div>
