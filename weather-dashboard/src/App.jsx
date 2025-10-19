@@ -5,7 +5,8 @@ import ErrorMessage from "./components/ErrorMessage";
 import UnitToggle from "./components/UnitToggle";
 import CityHistory from "./components/CityHistory";
 import Loader from "./components/Loader";
-import { fetchCurrent } from "./logic/api";
+import ForecastList from "./components/ForecastList";
+import { fetchCurrent, fetchForecast } from "./logic/api";
 
 const STORAGE_KEY = "recentCities";
 const MAX_RECENT = 5;
@@ -13,6 +14,7 @@ const MAX_RECENT = 5;
 export default function App() {
   const [units, setUnits] = useState("metric");
   const [data, setData] = useState(null);
+  const [forecast, setForecast] = useState([]);
   const [err, setErr] = useState("");
   const [lastCity, setLastCity] = useState("");
   const [recent, setRecent] = useState([]);
@@ -35,12 +37,34 @@ export default function App() {
   const handleSearch = async (city) => {
     setErr("");
     setData(null);
+    setForecast([]);
     setLastCity(city);
     setLoading(true);
     try {
-      const res = await fetchCurrent(city, units);
-      setData(res);
+      const [resCurrent, resForecast] = await Promise.all([
+        fetchCurrent(city, units),
+        fetchForecast(city, units),
+      ]);
+      setData(resCurrent);
       saveRecent(city);
+
+      const daily = [];
+      const map = {};
+      resForecast.list.forEach((item) => {
+        const date = new Date(item.dt_txt);
+        const day = date.toLocaleDateString("en-US", { weekday: "short" });
+        if (!map[day] && date.getHours() === 12) {
+          map[day] = true;
+          daily.push({
+            dt: item.dt,
+            day,
+            temp: item.main.temp,
+            icon: item.weather[0].icon,
+            desc: item.weather[0].main,
+          });
+        }
+      });
+      setForecast(daily.slice(0, 5));
     } catch {
       setErr("City not found or API error. Try again.");
     } finally {
@@ -50,20 +74,8 @@ export default function App() {
 
   useEffect(() => {
     if (!lastCity) return;
-    (async () => {
-      setLoading(true);
-      try {
-        const res = await fetchCurrent(lastCity, units);
-        setData(res);
-        setErr("");
-      } catch {
-        setErr("City not found or API error. Try again.");
-        setData(null);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [units, lastCity]);
+    handleSearch(lastCity);
+  }, [units]);
 
   const clearRecent = () => {
     setRecent([]);
@@ -71,18 +83,31 @@ export default function App() {
   };
 
   return (
-  <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-900">
-    <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-4">
-      <header className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between sm:items-center">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Weather Dashboard</h1>
-        <UnitToggle units={units} onChange={setUnits} />
-      </header>
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-900">
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-4">
+        <header className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between sm:items-center">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Weather Dashboard
+          </h1>
+          <UnitToggle units={units} onChange={setUnits} />
+        </header>
 
-      <SearchBar onSearch={handleSearch} />
-      <CityHistory items={recent} onSelect={handleSearch} onClear={clearRecent} />
-      <ErrorMessage msg={err} />
-      {loading ? <Loader /> : <WeatherCard data={data} units={units} />}
+        <SearchBar onSearch={handleSearch} />
+        <CityHistory
+          items={recent}
+          onSelect={handleSearch}
+          onClear={clearRecent}
+        />
+        <ErrorMessage msg={err} />
+        {loading ? (
+          <Loader />
+        ) : (
+          <>
+            <WeatherCard data={data} units={units} />
+            <ForecastList forecast={forecast} units={units} />
+          </>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
 }
