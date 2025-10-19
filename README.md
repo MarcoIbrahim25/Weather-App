@@ -25,19 +25,19 @@ OpenWeatherMap API
 
 📁 Project Files
 src/
-  components/
-    SearchBar.jsx
-    WeatherCard.jsx
-    ErrorMessage.jsx
-  logic/
-    api.js
-  App.jsx
-  App.css
-  index.css
+components/
+SearchBar.jsx
+WeatherCard.jsx
+ErrorMessage.jsx
+logic/
+api.js
+App.jsx
+App.css
+index.css
 
 💻 Deployment
 
-Deployed on Vercel or Netlify.
+Deployed on Netlify.
 👉 Live Demo: Pending
 
 ✍️ Author

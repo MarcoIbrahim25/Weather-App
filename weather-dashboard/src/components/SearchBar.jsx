@@ -11,9 +11,9 @@ export default function SearchBar({ onSearch }) {
         name="city"
         aria-label="Search city"
         placeholder="Enter city name..."
-        className="border border-gray-300 focus:border-sky-400 focus:ring-2 focus:ring-sky-100 px-3 py-2 rounded-lg w-full outline-none"
+        className="w-full rounded-2xl border border-white/50 bg-white/70 backdrop-blur px-4 py-3 outline-none shadow-sm focus:ring-4 ring-sky-200"
       />
-      <button className="px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 active:opacity-80 transition">
+      <button className="rounded-2xl px-5 py-3 font-medium text-white bg-gradient-to-r from-sky-500 to-indigo-500 shadow hover:scale-[1.01] active:scale-[.99] transition">
         Search
       </button>
     </form>

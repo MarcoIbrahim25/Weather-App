@@ -6,7 +6,7 @@ export default function CityHistory({ items = [], onSelect, onClear }) {
         <button
           key={c}
           onClick={() => onSelect(c)}
-          className="px-3 py-1 rounded-full border hover:bg-gray-50"
+          className="px-3 py-1.5 rounded-full border border-white/50 bg-white/70 backdrop-blur text-sm hover:shadow hover:-translate-y-0.5 transition"
           title={`Search ${c}`}
         >
           {c}
